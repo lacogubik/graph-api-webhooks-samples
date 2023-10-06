@@ -25,7 +25,7 @@ app.get('/', function(req, res) {
   res.send('<pre>' + JSON.stringify(received_updates, null, 2) + '</pre>');
 });
 
-app.get(['/facebook', '/instagram'], function(req, res) {
+app.get(['/webhooks'], function(req, res) {
   if (
     req.query['hub.mode'] == 'subscribe' &&
     req.query['hub.verify_token'] == token
@@ -36,25 +36,16 @@ app.get(['/facebook', '/instagram'], function(req, res) {
   }
 });
 
-app.post('/facebook', function(req, res) {
-  console.log('Facebook request body:', req.body);
+app.post('/webhooks', function(req, res) {
+  console.log('Meta webhook request body:', req.body);
 
   if (!req.isXHubValid()) {
     console.log('Warning - request header X-Hub-Signature not present or invalid');
-    res.sendStatus(401);
-    return;
+  } else {
+    console.log('request header X-Hub-Signature validated');
   }
 
-  console.log('request header X-Hub-Signature validated');
-  // Process the Facebook updates here
-  received_updates.unshift(req.body);
-  res.sendStatus(200);
-});
-
-app.post('/instagram', function(req, res) {
-  console.log('Instagram request body:');
-  console.log(req.body);
-  // Process the Instagram updates here
+  // Process the Meta updates here
   received_updates.unshift(req.body);
   res.sendStatus(200);
 });
